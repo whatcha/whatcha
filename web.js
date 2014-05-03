@@ -1,15 +1,28 @@
-// web.js
-var express = require("express");
-var logfmt = require("logfmt");
-var app = express();
+var koa = require('koa');
+var app = koa();
 
-app.use(logfmt.requestLogger());
+// x-response-time
 
-app.get('/', function(req, res) {
-  res.send('Hello World!');
+app.use(function *(next){
+  var start = new Date;
+  yield next;
+  var ms = new Date - start;
+  this.set('X-Response-Time', ms + 'ms');
 });
 
-var port = Number(process.env.PORT || 5000);
-app.listen(port, function() {
-  console.log("Listening on " + port);
+// logger
+
+app.use(function *(next){
+  var start = new Date;
+  yield next;
+  var ms = new Date - start;
+  console.log('%s %s - %s', this.method, this.url, ms);
 });
+
+// response
+
+app.use(function *(){
+  this.body = 'Hello World';
+});
+
+app.listen(3000);
