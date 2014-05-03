@@ -1,6 +1,6 @@
 ### Commands
 `foreman start`
-`heroku push heroku master`
+`git push heroku master`
 `heroku open`
 
 ### URLs
