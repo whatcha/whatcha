@@ -1,0 +1,31 @@
+{
+  "name": "whatcha",
+  "version": "0.0.0",
+  "description": "whatcha want input and output",
+  "main": "web.js",
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whatcha/whatcha.git"
+  },
+  "keywords": [
+    "input",
+    "output",
+    "interface"
+  ],
+  "author": "mark a woodall",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/whatcha/whatcha/issues"
+  },
+  "homepage": "https://github.com/whatcha/whatcha",
+  "dependencies": {
+    "express": "^4.1.1",
+    "logfmt": "^1.1.2"
+  },
+  "engines": {
+    "node": "0.10.x"
+  }
+}
