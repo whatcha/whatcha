@@ -67,5 +67,7 @@ function *create() {
 
 // listen
 
-app.listen(80);
-console.log('listening on port 80');
+var port = Number(process.env.PORT || 5000);
+app.listen(port, function() {
+  console.log("Listening on " + port);
+});
