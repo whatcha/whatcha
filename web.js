@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var render = require('./lib/render');
+var serve = require('koa-static');
 var logger = require('koa-logger');
 var route = require('koa-route');
 var parse = require('co-body');
@@ -12,7 +12,7 @@ var app = koa();
 
 // "database"
 
-var posts = [];
+var comments = [{author: 'mark a woodall', text: 'working on it...'}];
 
 // middleware
 
@@ -20,49 +20,25 @@ app.use(logger());
 
 // route middleware
 
-app.use(route.get('/', list));
-app.use(route.get('/post/new', add));
-app.use(route.get('/post/:id', show));
-app.use(route.post('/post', create));
+
+app.use(route.get('/comments.json', list));
+app.use(route.post('/comments.json', create));
+app.use(serve('.'));
 
 // route definitions
 
-/**
- * Post listing.
- */
 
 function *list() {
-  this.body = yield render('list', { posts: posts });
+    this.type = 'application/json';
+    this.body = JSON.stringify(comments);
 }
 
-/**
- * Show creation form.
- */
-
-function *add() {
-  this.body = yield render('new');
-}
-
-/**
- * Show post :id.
- */
-
-function *show(id) {
-  var post = posts[id];
-  if (!post) this.throw(404, 'invalid post id');
-  this.body = yield render('show', { post: post });
-}
-
-/**
- * Create a post.
- */
 
 function *create() {
-  var post = yield parse(this);
-  var id = posts.push(post) - 1;
-  post.created_at = new Date;
-  post.id = id;
-  this.redirect('/');
+    var comment = yield parse(this);
+    this.type = 'application/json';
+    comments.push(comment);
+    this.body = JSON.stringify(comments);
 }
 
 // listen
