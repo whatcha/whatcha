@@ -46,39 +46,21 @@ var CommentForm = React.createClass({
 var CommentBox = React.createClass({
   mixins: [ReactFireMixin],
 
-  loadCommentsFromServer: function() {
-    $.ajax({
-      url: this.props.url,
-      success: function(data) {
-        this.setState({data: data});
-      }.bind(this)
-    });
-  },
-  
   handleCommentSubmit: function(comment) {
     var comments = this.state.data;
     comments.push(comment);
     this.setState({data: comments});
-    $.ajax({
-      url: this.props.url,
-      type: 'POST',
-      data: comment,
-      success: function(data) {
-        this.setState({data: data});
-      }.bind(this)
-    });
+    this.firebaseRefs["data"].push(comment);
   },
   getInitialState: function() {
     return {data: []};
   },
   componentWillMount: function() {
-    this.loadCommentsFromServer();
-    setInterval(this.loadCommentsFromServer, this.props.pollInterval);
+    this.bindAsArray(new Firebase("https://flickering-fire-6695.firebaseio.com/data"), "data");
   },
   render: function() {
     return (
       <div className="commentBox">
-        <h1>whatcha.io</h1>
         <CommentList data={this.state.data} />
         <CommentForm onCommentSubmit={this.handleCommentSubmit} />
       </div>
@@ -86,8 +68,7 @@ var CommentBox = React.createClass({
   }
 });
 
-
 React.renderComponent(
-  <CommentBox url="/comments.json" pollInterval={2000} />,
-  document.getElementById('container')
+  <CommentBox />,
+  document.getElementById('container-new')
 );

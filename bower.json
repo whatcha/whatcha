@@ -1,0 +1,27 @@
+{
+  "name": "whatcha",
+  "version": "0.0.0",
+  "homepage": "https://github.com/whatcha/whatcha",
+  "authors": [
+    "Mark Woodall <mwdll@icloud.com>"
+  ],
+  "description": "simple input and output for you",
+  "main": "index.html",
+  "keywords": [
+    "react",
+    "koa",
+    "firebase"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "firebase": "~1.0.15"
+  }
+}

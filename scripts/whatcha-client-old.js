@@ -44,8 +44,6 @@ var CommentForm = React.createClass({
 });
 
 var CommentBox = React.createClass({
-  mixins: [ReactFireMixin],
-
   loadCommentsFromServer: function() {
     $.ajax({
       url: this.props.url,
@@ -54,7 +52,6 @@ var CommentBox = React.createClass({
       }.bind(this)
     });
   },
-  
   handleCommentSubmit: function(comment) {
     var comments = this.state.data;
     comments.push(comment);
