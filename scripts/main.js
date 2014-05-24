@@ -1,34 +1,32 @@
 /** @jsx React.DOM */
 
-var data = [
-  {
-    name: "Garage Door",
-    url: "https://api.spark.io/v1/devices/48ff65065067555051332287/switchState/?access_token=aa6fcb98e87d7e79694f35d531738795758e7303",
-    jsonNode: "result"
-  }
-];
+// var data = [
+//   {
+//     name: "Garage Door",
+//     url: "https://api.spark.io/v1/devices/48ff65065067555051332287/switchState/?access_token=aa6fcb98e87d7e79694f35d531738795758e7303",
+//     jsonNode: "result"
+//   }
+// ];
 
 var Indicator = React.createClass({
 
   getInitialState: function() {
-    return {data: []};
+    return {response: ""};
   },
 
   componentWillMount: function() {
 
-    console.log(this.props.url);
-
-    $.ajax({
-      url: this.props.url,
-      dataType: 'json',
-      success: function(response) {
-        // TODO allow jsonNode to be nested, e.g. coreInfo.result
-        this.setState({data: response[this.props.jsonNode]});
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
-      }.bind(this)
-    });
+      $.ajax({
+        url: this.props.url,
+        dataType: 'json',
+        success: function(response) {
+          // TODO allow jsonNode to be nested, e.g. coreInfo.result
+          this.setState({result: response[this.props.jsonNode]});
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(this.props.url, status, err.toString());
+        }.bind(this)
+      });
 
   },
 
@@ -38,19 +36,19 @@ var Indicator = React.createClass({
         <h2 className="indicatorName">
         {this.props.name}
         </h2>
-        {this.state.data}
+        {this.state.result}
       </div>
     );
   }
 });
 
 var IndicatorList = React.createClass({
+
   render: function() {
 
-    var indicatorNodes = this.props.data.map(function (indicator) {
+    var indicatorNodes = this.props.data.map(function (indicator, index) {
       return (
-        <Indicator name={indicator.name} url={indicator.url} jsonNode={indicator.jsonNode}>
-          {indicator.text}
+        <Indicator key={index} name={indicator.name} url={indicator.url} jsonNode={indicator.jsonNode}>
         </Indicator>
       );
     });
@@ -64,27 +62,58 @@ var IndicatorList = React.createClass({
 });
 
 var IndicatorForm = React.createClass({
+  handleSubmit: function() {
+    var name = this.refs.name.getDOMNode().value.trim();
+    var url = this.refs.url.getDOMNode().value.trim();
+    var jsonNode = this.refs.jsonNode.getDOMNode().value.trim();
+
+    this.props.onIndicatorSubmit({name: name, url: url, jsonNode: jsonNode});
+    this.refs.name.getDOMNode().value = '';
+    this.refs.url.getDOMNode().value = '';
+    this.refs.jsonNode.getDOMNode().value = '';
+    return false;
+  },
+
   render: function() {
     return (
-      <div className="indicatorForm">
-        Hello, world! I am a IndicatorForm.
-      </div>
+        <form className="indicatorForm" onSubmit={this.handleSubmit}>
+          <input type="text" placeholder="Indicator name" ref="name" />
+          <input type="text" placeholder="http://..." ref="url" />
+          <input type="text" placeholder="JSON node" ref="jsonNode" />
+          <input type="submit" value="Post" />
+        </form>
     );
   }
 });
 
 
 var ControlPanel = React.createClass({
+  mixins: [ReactFireMixin],
+
+  handleIndicatorSubmit: function(indicator) {
+    var indicators = this.state.data;
+    indicators.push(indicator);
+    this.setState({data: indicators});
+    this.firebaseRefs["data"].push(indicator);
+  },
+
+  getInitialState: function() {
+    return {data: []};
+  },
+  componentWillMount: function() {
+    this.bindAsArray(new Firebase("https://flickering-fire-6695.firebaseio.com/whatcha1"), "data");
+  },
+
   render: function() {
     return (
       <div className="controlPanel">
-        <IndicatorList data={this.props.data} />
-        <IndicatorForm />
+        <IndicatorList data={this.state.data} />
+        <IndicatorForm onIndicatorSubmit={this.handleIndicatorSubmit}/>
       </div>
     );
   }
 });
 React.renderComponent(
-  <ControlPanel data={data} />,
+  <ControlPanel />,
   document.getElementById('content')
 );
